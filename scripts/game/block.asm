@@ -98,7 +98,7 @@ BLOCK: {
     MergeCheckQueueSize:	.byte 255
 
 
-    MergeTimer:		.byte 0, 16
+    MergeTimer:		.byte 0, 13
     IsMerging:		.byte 0
 
     CheckMergeChain:		.byte 0
@@ -445,7 +445,7 @@ BLOCK: {
 			sec 
 			sbc NewFireBlockPosition
 
-			cmp #24
+			cmp #27
 			bcs EndLoop
 
 
@@ -1174,7 +1174,7 @@ BLOCK: {
 		cmp #26
 		bcc Finish
 
-		cmp #48
+		cmp #54
 		bcc MoveAllBlocksLeft
 
 		NoveAllBlockSRight:
@@ -1215,7 +1215,7 @@ BLOCK: {
 
 			lda BlocksOffset
 			clc
-			adc #24
+			adc #26
 			sta BlocksOffset
 			jmp Finish
 
@@ -1225,7 +1225,7 @@ BLOCK: {
 
 			lda BlocksOffset
 			sec
-			sbc #24
+			sbc #26
 			sta BlocksOffset
 
 
@@ -1356,12 +1356,15 @@ BLOCK: {
 			beq Okay
 
 			dec MoveTimer
+			bne Finish
+
+			jsr CatchAll
 			jmp Finish
 
 
 		Okay:
 
-	
+		
 
 		lda FramesPerPixel
 		sta MoveTimer
@@ -1370,6 +1373,9 @@ BLOCK: {
 
 		inc BlocksOffset
 		jsr CheckBlocksOffset
+
+		lda BlocksOffset
+	//	jsr SCORE.SetScore
 
 		//inc $d020
 
@@ -1403,6 +1409,7 @@ BLOCK: {
 
 		Finish:
 
+		
 		jsr MoveFireBlock
 
 		Exit:
@@ -1410,6 +1417,82 @@ BLOCK: {
 
 
 		rts
+	}
+
+
+	CatchAll: {
+
+		ldx #1
+		ldy #2
+
+		Loop:
+
+			sty Column
+
+			lda MoveIntoLeft, x
+			beq EndLoop
+
+			lda Values, x
+			beq EndLoop
+
+			cmp #13
+			beq EndLoop
+
+			cmp Values, y
+			beq StoreY
+
+			cpx #31
+			bcs EndLoop
+
+			txa
+			clc
+			adc #8
+
+
+			tay
+
+			lda Values, x
+			cmp Values, y
+			beq StoreY
+
+			jmp EndLoop
+
+
+			StoreY:	
+
+				//.break
+
+				sta FireBlockValue
+				sty FireBlockStoppedAt
+
+				lda Columns, y
+				sta FireBlockStopColumn
+
+				lda #1
+				sta CheckMergeChain
+				jmp Finish
+
+
+			EndLoop:
+
+				ldy Column
+
+				inx
+				iny
+				cpx #38
+				beq Finish
+				jmp Loop
+
+
+
+		Finish:	
+
+			
+
+
+			rts
+
+
 	}
 
 }

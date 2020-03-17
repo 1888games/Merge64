@@ -103,8 +103,11 @@ CONTROL: {
 		CheckFire:
 
 		
-			lda INPUT.FIRE_UP_THIS_FRAME, y
+			lda INPUT.JOY_FIRE_NOW, y
 			beq NoFire
+
+			lda INPUT.JOY_FIRE_LAST, y
+			bne NoFire
 
 			jsr Fire
 			jmp Finish

@@ -44,7 +44,23 @@ SCORE:{
 
 	}
 
+	SetScore: {
 
+		sta ScoreToAdd
+
+		lda #ZERO
+		sta Value
+		sta Value + 1
+		sta Value + 2
+		sta Value + 3
+
+		
+		jsr AddToScore
+
+		rts
+
+
+	}
 
 	ScorePoints: {
 
